@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
 import api from '../api';
 
+const s = {
+  card: { background: '#1a1d2e', border: '1px solid #2d3148', borderRadius: 12, padding: 20 },
+  input: { width: '100%', padding: '9px 12px', background: '#0f1117', border: '1px solid #2d3148', borderRadius: 8, color: '#f1f5f9', fontSize: 13, outline: 'none' },
+  label: { display: 'block', fontSize: 12, color: '#64748b', marginBottom: 5, fontWeight: 500 },
+  btnPrimary: { padding: '9px 20px', background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
+  th: { padding: '10px 14px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' },
+  td: { padding: '12px 14px', fontSize: 13, color: '#cbd5e1' },
+};
+
 function Membresias() {
   const [socios, setSocios] = useState([]);
   const [membresias, setMembresias] = useState([]);
@@ -10,9 +19,7 @@ function Membresias() {
   const [error, setError] = useState('');
   const [exito, setExito] = useState('');
 
-  useEffect(() => {
-    api.get('/socios').then(r => setSocios(r.data));
-  }, []);
+  useEffect(() => { api.get('/socios').then(r => setSocios(r.data)); }, []);
 
   const verificar = async (socioId) => {
     if (!socioId) return;
@@ -40,8 +47,7 @@ function Membresias() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setExito('');
+    setError(''); setExito('');
     try {
       await api.post('/membresias', { ...form, precio: Number(form.precio) });
       setExito('Membresía registrada correctamente');
@@ -54,64 +60,45 @@ function Membresias() {
   };
 
   return (
-    <div>
-      <h2 style={{ marginBottom: 16 }}>Gestión de Membresías</h2>
-
-      {/* Selector de socio */}
-      <div style={{ marginBottom: 20 }}>
-        <label style={{ fontWeight: 500 }}>Seleccionar socio:</label><br />
-        <select value={socioSeleccionado} onChange={handleSocioChange} style={{ padding: 8, marginTop: 6, minWidth: 250 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Selector socio */}
+      <div style={s.card}>
+        <label style={{ ...s.label, fontSize: 13, marginBottom: 8 }}>Seleccionar socio</label>
+        <select value={socioSeleccionado} onChange={handleSocioChange} style={{ ...s.input, maxWidth: 320 }}>
           <option value="">-- Selecciona un socio --</option>
-          {socios.map(s => <option key={s.id} value={s.id}>{s.nombre} ({s.rut})</option>)}
+          {socios.map(sc => <option key={sc.id} value={sc.id}>{sc.nombre} ({sc.rut})</option>)}
         </select>
+
+        {vigencia && (
+          <div style={{
+            marginTop: 14, padding: '10px 14px', borderRadius: 8, fontSize: 13,
+            background: vigencia.vigente ? 'rgba(74,222,128,0.1)' : 'rgba(239,68,68,0.1)',
+            border: `1px solid ${vigencia.vigente ? 'rgba(74,222,128,0.3)' : 'rgba(239,68,68,0.3)'}`,
+            color: vigencia.vigente ? '#4ade80' : '#f87171'
+          }}>
+            {vigencia.vigente ? `✅ Membresía vigente hasta: ${vigencia.vencimiento}` : `❌ ${vigencia.mensaje}`}
+          </div>
+        )}
       </div>
 
-      {/* Estado de vigencia */}
-      {vigencia && (
-        <div style={{
-          padding: '12px 16px', borderRadius: 8, marginBottom: 20,
-          background: vigencia.vigente ? '#dcfce7' : '#fee2e2',
-          border: `1px solid ${vigencia.vigente ? '#16a34a' : '#ef4444'}`,
-          color: vigencia.vigente ? '#15803d' : '#b91c1c'
-        }}>
-          {vigencia.vigente
-            ? `✅ Membresía vigente hasta: ${vigencia.vencimiento}`
-            : `❌ ${vigencia.mensaje}`}
-        </div>
-      )}
-
-      {/* Formulario nueva membresía */}
+      {/* Formulario */}
       {socioSeleccionado && (
-        <div style={{ background: '#f9fafb', padding: 20, borderRadius: 8, marginBottom: 24, border: '1px solid #e5e7eb' }}>
-          <h3 style={{ marginBottom: 12 }}>Renovar / Nueva membresía</h3>
-          {error && <p style={{ color: 'red', marginBottom: 12 }}>{error}</p>}
-          {exito && <p style={{ color: 'green', marginBottom: 12 }}>{exito}</p>}
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div style={s.card}>
+          <h2 style={{ fontSize: 15, fontWeight: 600, color: '#f1f5f9', marginBottom: 16 }}>💳 Renovar / Nueva membresía</h2>
+          {error && <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: '10px 14px', marginBottom: 14, color: '#f87171', fontSize: 13 }}>{error}</div>}
+          {exito && <div style={{ background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', borderRadius: 8, padding: '10px 14px', marginBottom: 14, color: '#4ade80', fontSize: 13 }}>{exito}</div>}
+          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
-              <label>Tipo</label><br />
-              <select value={form.tipo} onChange={e => setForm({ ...form, tipo: e.target.value })} style={{ width: '100%', padding: 8 }}>
-                <option>Mensual</option>
-                <option>Trimestral</option>
-                <option>Semestral</option>
-                <option>Anual</option>
+              <label style={s.label}>Tipo</label>
+              <select value={form.tipo} onChange={e => setForm({ ...form, tipo: e.target.value })} style={s.input}>
+                <option>Mensual</option><option>Trimestral</option><option>Semestral</option><option>Anual</option>
               </select>
             </div>
-            <div>
-              <label>Precio</label><br />
-              <input type="number" value={form.precio} onChange={e => setForm({ ...form, precio: e.target.value })} style={{ width: '100%', padding: 8 }} required />
-            </div>
-            <div>
-              <label>Fecha inicio</label><br />
-              <input type="date" value={form.fechaInicio} onChange={e => setForm({ ...form, fechaInicio: e.target.value })} style={{ width: '100%', padding: 8 }} required />
-            </div>
-            <div>
-              <label>Fecha vencimiento</label><br />
-              <input type="date" value={form.fechaVencimiento} onChange={e => setForm({ ...form, fechaVencimiento: e.target.value })} style={{ width: '100%', padding: 8 }} required />
-            </div>
+            <div><label style={s.label}>Precio</label><input type="number" value={form.precio} onChange={e => setForm({ ...form, precio: e.target.value })} style={s.input} required /></div>
+            <div><label style={s.label}>Fecha inicio</label><input type="date" value={form.fechaInicio} onChange={e => setForm({ ...form, fechaInicio: e.target.value })} style={s.input} required /></div>
+            <div><label style={s.label}>Fecha vencimiento</label><input type="date" value={form.fechaVencimiento} onChange={e => setForm({ ...form, fechaVencimiento: e.target.value })} style={s.input} required /></div>
             <div style={{ gridColumn: 'span 2' }}>
-              <button type="submit" style={{ padding: '10px 24px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6 }}>
-                Registrar membresía
-              </button>
+              <button type="submit" style={s.btnPrimary}>Registrar membresía</button>
             </div>
           </form>
         </div>
@@ -119,16 +106,12 @@ function Membresias() {
 
       {/* Historial */}
       {membresias.length > 0 && (
-        <>
-          <h3 style={{ marginBottom: 12 }}>Historial de membresías</h3>
+        <div style={s.card}>
+          <h2 style={{ fontSize: 15, fontWeight: 600, color: '#f1f5f9', marginBottom: 16 }}>📋 Historial de membresías</h2>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#f3f4f6' }}>
-                <th style={th}>Tipo</th>
-                <th style={th}>Inicio</th>
-                <th style={th}>Vencimiento</th>
-                <th style={th}>Precio</th>
-                <th style={th}>Estado</th>
+              <tr style={{ borderBottom: '1px solid #2d3148' }}>
+                <th style={s.th}>Tipo</th><th style={s.th}>Inicio</th><th style={s.th}>Vencimiento</th><th style={s.th}>Precio</th><th style={s.th}>Estado</th>
               </tr>
             </thead>
             <tbody>
@@ -136,13 +119,13 @@ function Membresias() {
                 const hoy = new Date().toISOString().split('T')[0];
                 const vigente = m.fechaVencimiento >= hoy;
                 return (
-                  <tr key={m.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                    <td style={td}>{m.tipo}</td>
-                    <td style={td}>{m.fechaInicio}</td>
-                    <td style={td}>{m.fechaVencimiento}</td>
-                    <td style={td}>${Number(m.precio).toLocaleString()}</td>
-                    <td style={td}>
-                      <span style={{ color: vigente ? '#16a34a' : '#ef4444', fontWeight: 500 }}>
+                  <tr key={m.id} style={{ borderBottom: '1px solid #1e2135' }}>
+                    <td style={s.td}>{m.tipo}</td>
+                    <td style={s.td}>{m.fechaInicio}</td>
+                    <td style={s.td}>{m.fechaVencimiento}</td>
+                    <td style={s.td}>${Number(m.precio).toLocaleString()}</td>
+                    <td style={s.td}>
+                      <span style={{ background: vigente ? 'rgba(74,222,128,0.15)' : 'rgba(239,68,68,0.15)', color: vigente ? '#4ade80' : '#f87171', padding: '2px 8px', borderRadius: 4, fontSize: 12, fontWeight: 500 }}>
                         {vigente ? 'Vigente' : 'Vencida'}
                       </span>
                     </td>
@@ -151,13 +134,10 @@ function Membresias() {
               })}
             </tbody>
           </table>
-        </>
+        </div>
       )}
     </div>
   );
 }
-
-const th = { padding: '10px 12px', textAlign: 'left', fontWeight: 600, fontSize: 14 };
-const td = { padding: '10px 12px', fontSize: 14 };
 
 export default Membresias;
