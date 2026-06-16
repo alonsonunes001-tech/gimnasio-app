@@ -1,6 +1,6 @@
 # 🏋️ Gimnasio App
 
-Sistema de gestión de gimnasio con registro de socios, planes y membresías.
+Sistema de gestión de gimnasio con registro de socios, planes, clases y membresías.
 
 ## Stack tecnológico
 
@@ -8,10 +8,15 @@ Sistema de gestión de gimnasio con registro de socios, planes y membresías.
 - **Cliente:** React + Vite + Axios
 - **Auth:** JWT + bcryptjs
 
-## Requisitos previos
+## URLs de producción
 
-- Node.js instalado
-- PostgreSQL instalado
+- **Frontend:** https://genuine-scone-5a21d9.netlify.app/
+- **API:** https://gimnasio-app-production.up.railway.app/
+
+## Credenciales de prueba
+
+- **Email:** admin@gym.com
+- **Password:** 123456
 
 ## Instalación local
 
@@ -20,7 +25,6 @@ Sistema de gestión de gimnasio con registro de socios, planes y membresías.
 cd api
 npm install
 cp .env.example .env
-# Editar .env con tus datos de BD y JWT_SECRET
 npm run dev
 ```
 
@@ -31,28 +35,35 @@ npm install
 npm run dev
 ```
 
-- API: http://localhost:3000
-- Cliente: http://localhost:5174
+- API local: http://localhost:3000
+- Cliente local: http://localhost:5173
 
 ## Matriz de avance
 
 | ID | Requisito | Estado | Pantalla web |
 |----|-----------|--------|--------------|
-| GEN-01 | Proyecto inicializado | ✅ Desarrollado | No aplica |
-| GEN-02 | Base de datos conectada | ✅ Desarrollado | No aplica |
-| GEN-03 | Primera migración ejecutada | ✅ Desarrollado | No aplica |
+| GEN-01 | Estructura del repositorio y README | ✅ Desarrollado | No aplica |
+| GEN-02 | Variables de entorno y .env.example | ✅ Desarrollado | No aplica |
+| GEN-03 | Conexión a BD y migraciones iniciales | ✅ Desarrollado | No aplica |
 | GEN-04 | Registro de usuario | ✅ Desarrollado | No aplica |
-| GEN-05 | Login con JWT | ✅ Desarrollado | No aplica |
-| GEN-06 | Rutas protegidas por JWT | ✅ Desarrollado | No aplica |
+| GEN-05 | Login y emisión JWT | ✅ Desarrollado | ✅ Sí |
+| GEN-06 | Middleware de autenticación | ✅ Desarrollado | No aplica |
+| GEN-07 | Restablecer contraseña | ✅ Desarrollado | ✅ Sí |
+| GEN-08 | Manejo centralizado de errores | ✅ Desarrollado | No aplica |
+| GEN-09 | CRUD REST y pantallas web | ✅ Desarrollado | ✅ Sí |
+| GEN-10 | Validaciones de entrada | ✅ Desarrollado | No aplica |
+| GEN-11 | Colección Postman | ✅ Desarrollado | No aplica |
+| GEN-12 | Evolución de esquema | ✅ Desarrollado | No aplica |
+| GEN-13 | Despliegue API+BD Railway y front Netlify | ✅ Desarrollado | ✅ Sí |
 | rq-01 | Modelo Socio | ✅ Desarrollado | No aplica |
 | rq-02 | Modelo Membresía | ✅ Desarrollado | No aplica |
 | rq-03 | CRUD socios | ✅ Desarrollado | ✅ Sí |
-| rq-04 | CRUD clases | ⏳ Pendiente | — |
-| rq-05 | Validar membresía vigente | ⏳ Pendiente | — |
-| rq-06 | Cupo lleno en clase | ⏳ Pendiente | — |
-| rq-07 | Filtros socios/clases | ⏳ Pendiente | — |
+| rq-04 | CRUD clases | ✅ Desarrollado | ✅ Sí |
+| rq-05 | Validar membresía vigente | ✅ Desarrollado | ✅ Sí |
+| rq-06 | Cupo lleno en clase | ✅ Desarrollado | ✅ Sí |
+| rq-07 | Filtros socios/clases | ✅ Desarrollado | ✅ Sí |
 | rq-08 | Panel socios y membresías | ✅ Desarrollado | ✅ Sí |
-| rq-09 | Flujo transaccional | ⏳ Pendiente | — |
-| rq-10 | Funcionalidad avanzada | ⏳ Pendiente | — |
+| rq-09 | Renovar membresía / inscribir a clase | ✅ Desarrollado | ✅ Sí |
+| rq-10 | Reporte de ocupación | ✅ Desarrollado | ✅ Sí |
 
-**Progreso Hito 2:** 10/23 requisitos desarrollados (43.5%)
+**Progreso Hito 3:** 23/23 requisitos desarrollados (100%)
