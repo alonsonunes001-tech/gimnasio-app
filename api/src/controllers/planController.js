@@ -11,16 +11,16 @@ const getAll = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { nombre, descripcion, precio, duracionMeses } = req.body;
-    if (!nombre || !precio)
-      return res.status(400).json({ error: 'Nombre y precio son requeridos' });
-    const plan = await Plan.create({ nombre, descripcion, precio, duracionMeses });
+    const { nombre, descripcion, precio, duracionDias } = req.body;
+    if (!nombre || !precio || !duracionDias)
+      return res.status(400).json({ error: 'Nombre, precio y duracionDias son requeridos' });
+    const plan = await Plan.create({ nombre, descripcion, precio, duracionDias });
     res.status(201).json(plan);
   } catch (err) {
-    res.status(500).json({ error: 'Error al crear plan' });
+    console.log(err);
+    res.status(500).json({ error: err.message });
   }
 };
-
 const update = async (req, res) => {
   try {
     const plan = await Plan.findByPk(req.params.id);

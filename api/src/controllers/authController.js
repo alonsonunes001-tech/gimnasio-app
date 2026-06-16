@@ -45,4 +45,29 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const cambiarPassword = async (req, res) => {
+  try {
+    const { email, passwordActual, passwordNueva } = req.body;
+    if (!email || !passwordActual || !passwordNueva)
+      return res.status(400).json({ error: 'Todos los campos son requeridos' });
+
+    if (passwordNueva.length < 6)
+      return res.status(400).json({ error: 'La nueva contraseña debe tener al menos 6 caracteres' });
+
+    const usuario = await Usuario.findOne({ where: { email } });
+    if (!usuario)
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+
+    const valido = await bcrypt.compare(passwordActual, usuario.password);
+    if (!valido)
+      return res.status(401).json({ error: 'Contraseña actual incorrecta' });
+
+    const hash = await bcrypt.hash(passwordNueva, 10);
+    await usuario.update({ password: hash });
+    res.json({ mensaje: 'Contraseña actualizada correctamente' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = { register, login, cambiarPassword };
