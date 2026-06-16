@@ -7,10 +7,17 @@
     "dialect": "postgres"
   },
   "production": {
-    "username": "postgres",
-    "password": "A1234",
-    "database": "gimnasio_db",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
+    "username": "${DB_USER}",
+    "password": "${DB_PASSWORD}",
+    "database": "${DB_NAME}",
+    "host": "${DB_HOST}",
+    "port": "${DB_PORT}",
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
   }
 }
