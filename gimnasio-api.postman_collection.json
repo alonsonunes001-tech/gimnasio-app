@@ -1,67 +1,324 @@
 {
   "info": {
-    "_postman_id": "4c8e0077-871a-4e9a-9dc5-c3fc843d2aee",
     "name": "Gimnasio API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "54790270",
-    "_collection_link": "https://go.postman.co/collection/54790270-4c8e0077-871a-4e9a-9dc5-c3fc843d2aee?source=collection_link"
+    "description": "Colección de endpoints para el proyecto Gimnasio App. Incluye autenticación JWT, CRUD de socios, clases, membresías y casos de error (401, 404, 409, 422).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{token}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://gimnasio-app-production.up.railway.app/api" },
+    { "key": "token", "value": "" }
+  ],
   "item": [
     {
-      "name": "Login",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Test User\",\n  \"email\": \"test@gym.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Register - Email duplicado (409)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Admin\",\n  \"email\": \"admin@gym.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set('token', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@gym.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login - Credenciales inválidas (401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@gym.com\",\n  \"password\": \"contraseñaIncorrecta\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Cambiar Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@gym.com\",\n  \"passwordActual\": \"123456\",\n  \"passwordNueva\": \"123456\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/cambiar-password"
+          }
+        }
+      ]
     },
     {
-      "name": "Register",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
+      "name": "Socios",
+      "item": [
+        {
+          "name": "Get Socios",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [],
+            "url": "{{baseUrl}}/socios"
+          }
+        },
+        {
+          "name": "Get Socios - Sin token (401)",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "header": [],
+            "url": "{{baseUrl}}/socios"
+          }
+        },
+        {
+          "name": "Create Socio",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"rut\": \"11111111-1\",\n  \"email\": \"juan@test.com\",\n  \"telefono\": \"912345678\"\n}"
+            },
+            "url": "{{baseUrl}}/socios"
+          }
+        },
+        {
+          "name": "Create Socio - Datos inválidos (400)",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"A\",\n  \"rut\": \"123\",\n  \"email\": \"correo-invalido\"\n}"
+            },
+            "url": "{{baseUrl}}/socios"
+          }
+        },
+        {
+          "name": "Update Socio",
+          "request": {
+            "method": "PUT",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan Pérez Actualizado\",\n  \"rut\": \"11111111-1\",\n  \"email\": \"juan@test.com\",\n  \"telefono\": \"987654321\"\n}"
+            },
+            "url": "{{baseUrl}}/socios/4"
+          }
+        },
+        {
+          "name": "Delete Socio",
+          "request": {
+            "method": "DELETE",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [],
+            "url": "{{baseUrl}}/socios/4"
+          }
+        },
+        {
+          "name": "Delete Socio - No encontrado (404)",
+          "request": {
+            "method": "DELETE",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [],
+            "url": "{{baseUrl}}/socios/99999"
+          }
+        }
+      ]
     },
     {
-      "name": "Get Socios",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
+      "name": "Planes",
+      "item": [
+        {
+          "name": "Get Planes",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [],
+            "url": "{{baseUrl}}/planes"
+          }
+        },
+        {
+          "name": "Create Plan",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Plan Mensual\",\n  \"descripcion\": \"Acceso mensual\",\n  \"precio\": 25000,\n  \"duracionDias\": 30\n}"
+            },
+            "url": "{{baseUrl}}/planes"
+          }
+        }
+      ]
     },
     {
-      "name": "Create Socio",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
+      "name": "Clases",
+      "item": [
+        {
+          "name": "Get Clases",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [],
+            "url": "{{baseUrl}}/clases"
+          }
+        },
+        {
+          "name": "Get Clases - Filtro por día",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [],
+            "url": "{{baseUrl}}/clases?dia=Lunes"
+          }
+        },
+        {
+          "name": "Create Clase",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Yoga\",\n  \"instructor\": \"Ana García\",\n  \"horario\": \"08:00 - 09:00\",\n  \"capacidad\": 10,\n  \"dia\": \"Lunes\"\n}"
+            },
+            "url": "{{baseUrl}}/clases"
+          }
+        },
+        {
+          "name": "Create Clase - Datos inválidos (400)",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Y\",\n  \"capacidad\": -1\n}"
+            },
+            "url": "{{baseUrl}}/clases"
+          }
+        },
+        {
+          "name": "Inscribir a Clase",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"socioId\": 4\n}"
+            },
+            "url": "{{baseUrl}}/clases/1/inscribir"
+          }
+        },
+        {
+          "name": "Inscribir a Clase - Cupo lleno (409)",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"socioId\": 4\n}"
+            },
+            "url": "{{baseUrl}}/clases/1/inscribir"
+          }
+        }
+      ]
     },
     {
-      "name": "Get Clases",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
-    },
-    {
-      "name": "Inscribir Clase",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
-    },
-    {
-      "name": "Verificar Membresia",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
+      "name": "Membresias",
+      "item": [
+        {
+          "name": "Create Membresia",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"socioId\": 4,\n  \"tipo\": \"Mensual\",\n  \"fechaInicio\": \"2026-06-01\",\n  \"fechaVencimiento\": \"2026-07-01\",\n  \"precio\": 25000\n}"
+            },
+            "url": "{{baseUrl}}/membresias"
+          }
+        },
+        {
+          "name": "Get Membresias por Socio",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [],
+            "url": "{{baseUrl}}/membresias/socio/4"
+          }
+        },
+        {
+          "name": "Verificar Membresia Vigente",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [],
+            "url": "{{baseUrl}}/membresias/verificar/4"
+          }
+        },
+        {
+          "name": "Verificar Membresia - Sin membresía activa (422)",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "header": [],
+            "url": "{{baseUrl}}/membresias/verificar/99999"
+          }
+        }
+      ]
     }
   ]
 }
