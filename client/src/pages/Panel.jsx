@@ -19,7 +19,7 @@ const s = {
 };
 
 function Panel({ onLogout }) {
-  const [vista, setVista] = useState('socios');
+  const [vista, setVista] = useState('inicio');
   const [socios, setSocios] = useState([]);
   const [planes, setPlanes] = useState([]);
   const [form, setForm] = useState({ nombre: '', rut: '', email: '', telefono: '', planId: '' });
@@ -27,8 +27,8 @@ function Panel({ onLogout }) {
   const [error, setError] = useState('');
 
   const cargarDatos = async () => {
-    const [s, p] = await Promise.all([api.get('/socios'), api.get('/planes')]);
-    setSocios(s.data);
+    const [sc, p] = await Promise.all([api.get('/socios'), api.get('/planes')]);
+    setSocios(sc.data);
     setPlanes(p.data);
   };
 
@@ -63,6 +63,7 @@ function Panel({ onLogout }) {
   };
 
   const navItems = [
+    { id: 'inicio', label: '🏠 Inicio' },
     { id: 'socios', label: '👥 Socios' },
     { id: 'clases', label: '🏃 Clases' },
     { id: 'membresias', label: '💳 Membresías' },
@@ -103,6 +104,43 @@ function Panel({ onLogout }) {
 
       {/* Contenido */}
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 24px' }}>
+
+        {/* Vista Inicio */}
+        {vista === 'inicio' && (
+          <div style={{ textAlign: 'center', padding: '60px 24px' }}>
+            <div style={{ fontSize: 72, marginBottom: 16 }}>🏋️</div>
+            <h1 style={{ fontSize: 32, fontWeight: 700, color: '#f1f5f9', marginBottom: 12 }}>
+              Bienvenido a Gimnasio App
+            </h1>
+            <p style={{ color: '#64748b', fontSize: 16, marginBottom: 40, maxWidth: 480, margin: '0 auto 40px' }}>
+              Gestiona socios, clases, membresías y más desde un solo lugar.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, maxWidth: 700, margin: '0 auto' }}>
+              {[
+                { icon: '👥', label: 'Socios', desc: 'Administra los socios del gimnasio', id: 'socios' },
+                { icon: '🏃', label: 'Clases', desc: 'Gestiona las clases y horarios', id: 'clases' },
+                { icon: '💳', label: 'Membresías', desc: 'Controla las membresías activas', id: 'membresias' },
+                { icon: '📋', label: 'Inscripciones', desc: 'Inscribe socios a clases', id: 'inscripciones' },
+                { icon: '📊', label: 'Reporte', desc: 'Revisa la ocupación del gimnasio', id: 'reporte' },
+                { icon: '🔒', label: 'Contraseña', desc: 'Cambia tu contraseña', id: 'password' },
+              ].map(({ icon, label, desc, id }) => (
+                <div key={id} onClick={() => setVista(id)} style={{
+                  background: '#1a1d2e', border: '1px solid #2d3148', borderRadius: 12,
+                  padding: '24px 16px', cursor: 'pointer', textAlign: 'center',
+                  transition: 'all 0.2s'
+                }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = '#818cf8'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = '#2d3148'}
+                >
+                  <div style={{ fontSize: 32, marginBottom: 8 }}>{icon}</div>
+                  <div style={{ fontWeight: 600, color: '#f1f5f9', marginBottom: 4 }}>{label}</div>
+                  <div style={{ fontSize: 12, color: '#64748b' }}>{desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {vista === 'clases' && <Clases />}
         {vista === 'membresias' && <Membresias />}
         {vista === 'inscripciones' && <Inscripciones />}
